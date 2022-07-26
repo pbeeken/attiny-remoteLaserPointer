@@ -1,25 +1,33 @@
 // Load HTTP module
 //const http = require("http")
 import * as http from "http"
-import * as fs from 'fs'
+import * as fs from "fs/promises"
 
 let quotes = []
 
+/**
+ * read the quotes into memory
+ * https://nodejs.dev/learn/reading-files-with-nodejs
+ * This should probably be cached once to store the values and be done. I want to practice
+ * With live updating by changing the contents of the quotes and see how it manifests in the client page.
+ * @param fn is the server filename containing quotes
+ */
 async function readQuotes(fn) {
-    return new fs.readFile(fn, 'utf8', (err, data) => {
-        if(err) 
-            throw err
-
-        return data.split('\n')
-    })
+    try {
+        const data = await fs.readFile(fn, {encoding:'utf8'})
+        quotes = data.split('\n')
+    } catch (err) {
+        console.log(err)
+    }
 }
 
+/**
+ * From the file, pick a line randomly and providing it for displays
+ * @returns a random line.
+ */
 function picRandomQuote() {
-
     //let quotes = 
-    readQuotes('foo.txt').then((x)=>{
-        quotes = x
-    })
+    readQuotes('foo.txt');
 
     if (quotes.length === 0)
         return "I got nothing."
@@ -31,7 +39,10 @@ function picRandomQuote() {
 const hostname = "10.110.110.156" //"127.0.0.1"
 const port = 8000
 
-// Create HTTP server
+
+/** Create HTTP server
+ *  
+ **/ 
 const server = http.createServer( (req, res) => {
 
     // Set the response HTTP header with HTTP status and Content type
