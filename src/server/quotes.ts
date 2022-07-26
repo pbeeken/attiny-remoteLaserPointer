@@ -111,7 +111,7 @@ const server = http.createServer( (req, res) => {
         console.log(`${req.url} handled.`)
     }
 
-    else if (req.url === "/client.js") {
+    else if (req!.url === "/client.js") {
         let data = ""
         readScriptFile('client.js').then((contents) =>{
             res.writeHead(200, { 'Content-Type': 'text/plain' })
@@ -120,8 +120,8 @@ const server = http.createServer( (req, res) => {
         console.log(`${req.url} handled.`)
     }
 
-    else if (req.url.endsWith(".map")) {
-        const mapFile = (req.url).substring(1)
+    else if (req.url!.endsWith(".map")) {
+        const mapFile = (req.url!).substring(1)
         let data = ""
         readScriptFile(mapFile).then((contents) =>{
         res.writeHead(200, { 'Content-Type': 'text/plain' })
