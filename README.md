@@ -15,3 +15,4 @@ I have a server file which contains quotes in a text file. I read the file in to
   - Currently this is driven by the client updating the page using a refresh. **Is there a way the server can push this out?**  
   - I write all the structural elements directly within the code. **Is this the best way to do this or should the static bits be in a file with the program managing the dynamic elements?**
     - Jury's still out on this one. Getting information back and forth might be a bit tricky but I am now looking at wrtiting code that does requests through fetch calls.  Push tech is still above my paygrade right now.  I am still thinking a simple socket layer would be OK.
+    - [Methods for transferring data](https://www.c-sharpcorner.com/UploadFile/suthish_nair/different-ways-to-pass-data-between-web-forms/) gives a nice summary of options.
