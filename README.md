@@ -1,11 +1,11 @@
 # Web App Explorations
 
 This is an exploration of web app built on node. Eventually this will run on a Raspberry Pi that is retreiving data from 
-the PIO pins and $I^2C$ devices.  This may include output as well as output.
+the PIO pins and $I^2C$ devices.  This may include output as well as input.
 
-What do I need to learn:
-  - I need to understand how async operations work with the Promise model of code handling
-  - When do I control caching and how to update content pushed from the server vs being requested by client.
+General things I need to learn:
+  - How async operations work with the Promise model of code handling
+  - When do I control caching and update content pushed from the server vs being requested by client?
 
 ## Naive starting point: Quotes
 I have a server file which contains quotes in a text file. I read the file in to a server script and serves pages with a randomly changing choice from the file.  
