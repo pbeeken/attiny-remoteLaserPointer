@@ -12,6 +12,7 @@
   },
   "scripts": {
     "lint": "eslint -f unix src",
+    "lint:fix": "npm run lint -- --fix",
     "start": "nodemon ./src/server/server.ts",
     "watch:build": "tsc -w",
     "test": "ts-node test/index.js"

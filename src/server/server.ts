@@ -12,11 +12,14 @@ server.listen(8000, '0.0.0.0', 128, () =>
 const BASE_DIR = 'public';
 
 async function main() {
-  for await (const [req, res] of on(server, 'request')) {
-    const request: IncomingMessage = req;
-    const response: ServerResponse = res;
-
-    const url = new URL(request.url ?? '/', `http://${request.headers.host}`);
+  for await (const [request, response] of on(
+    server,
+    'request'
+  ) as AsyncIterable<[IncomingMessage, ServerResponse]>) {
+    const url = new URL(
+      request.url ?? '/',
+      `http://${String(request.headers.host)}`
+    );
 
     console.log(request.method, url.pathname);
 
@@ -58,7 +61,8 @@ async function main() {
       }
     } catch (error) {
       response.statusCode = 500;
-      response.end(`Bad Request: ${error}`, 'utf8');
+      const message = error instanceof Error ? error.message : 'unknown error';
+      response.end(`Bad Request: ${message}`, 'utf8');
     }
   }
 }

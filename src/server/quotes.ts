@@ -1,3 +1,4 @@
+/* eslint-disable */
 // Load modules
 import * as http from 'http';
 import * as fs from 'fs/promises';
