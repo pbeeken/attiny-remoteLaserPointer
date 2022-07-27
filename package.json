@@ -13,6 +13,7 @@
   "scripts": {
     "lint": "eslint -f unix src",
     "start": "nodemon ./src/server/server.ts",
-    "watch:build": "tsc -w"
+    "watch:build": "tsc -w",
+    "test": "ts-node test/index.js"
   }
 }
