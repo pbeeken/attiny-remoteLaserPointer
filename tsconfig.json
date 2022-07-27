@@ -4,8 +4,10 @@
       "module": "CommonJS",
       "strict": true,
       "sourceMap": true,
-      "rootDir": "src/",
-      "outDir": "dist/",
+      "outDir": "dist",
+      "types": ["node"],
       "lib": ["DOM", "ES2020"],
-    }
+    },
+    "include": ["src/**/*"],
+    "exclude": ["dist/**/*"]
   }
