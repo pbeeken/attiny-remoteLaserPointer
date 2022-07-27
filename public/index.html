@@ -25,9 +25,8 @@
     <script>
         async function toggleLED(state) {
             let val = Math.floor(100 * Math.random())
-            await fetch('/api?' + 'led=' + state + '&' + 'other=' + val).then(r => {
-                console.log(r.json());
-            });
+            const resp = await fetch('/api?' + 'led=' + state + '&' + 'other=' + val).then((r)=>r.json())
+            console.log('rsp:' + JSON.stringify(resp))
         }
     </script>
 </head>

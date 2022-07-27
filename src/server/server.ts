@@ -8,7 +8,7 @@
  */
 import { readFile } from 'node:fs/promises';
 import * as http from 'node:http';
-import * as querystring from 'node:querystring';
+import * as url from 'node:url';
 import { on } from 'node:events';
 import * as path from 'node:path';
 import type { IncomingMessage, ServerResponse } from 'node:http';
@@ -71,9 +71,9 @@ async function main() {
       } else if (theURL.pathname.startsWith('/api')) {
         // REST call handling
         // browser side code: await fetch('/api').then(r => r.json())
-        const query = querystring.parse(theURL.search);
-        console.log(query);
-        response.end(JSON.stringify({ led: 'on' }));
+        // const query = querystring.parse(theURL.search);
+        const theQuery = url.parse(theURL.search, true).query;
+        response.end(JSON.stringify(theQuery));  // spit it back as feedback.
 
         // grab any file which matches the request
       } else {
