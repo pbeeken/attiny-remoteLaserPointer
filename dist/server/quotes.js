@@ -1,19 +1,9 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-//# sourceMappingURL=quotes.js.map
 // Load modules
 const http = require("http");
 const fs = require("fs/promises");
-const hostname = "10.110.110.156"; //"127.0.0.1"
+const hostname = "0.0.0.0"; //"127.0.0.1"
 const port = 8000;
 const endl = "\n\r";
 let quotes = [];
@@ -25,33 +15,29 @@ let fileList = "";
  * With live updating by changing the contents of the quotes and see how it manifests in the client page.
  * @param fn is the server filename containing quotes
  */
-function readQuotes(fn) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const data = yield fs.readFile(fn, { encoding: 'utf8' });
-            quotes = data.split('\n');
-        }
-        catch (err) {
-            console.log(err);
-        }
-    });
+async function readQuotes(fn) {
+    try {
+        const data = await fs.readFile(fn, { encoding: 'utf8' });
+        quotes = data.split('\n');
+    }
+    catch (err) {
+        console.log(err);
+    }
 }
 let script = "";
 /**
  * Read script file
  */
-function readScriptFile(fn) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            console.log(`Reading...${fn}`);
-            const data = yield fs.readFile(fn, { encoding: 'utf8' });
-            script = data;
-            console.log(`${script.length}`);
-        }
-        catch (err) {
-            console.log(err);
-        }
-    });
+async function readScriptFile(fn) {
+    try {
+        console.log(`Reading...${fn}`);
+        const data = await fs.readFile(fn, { encoding: 'utf8' });
+        script = data;
+        console.log(`${script.length}`);
+    }
+    catch (err) {
+        console.log(err);
+    }
 }
 /**
  * From the file, pick a line randomly and providing it for displays
@@ -65,16 +51,14 @@ function picRandomQuote() {
     let i = Math.floor(Math.random() * quotes.length);
     return quotes[i];
 }
-function getFileList() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const data = yield fs.readdir("."); // list of files
-            fileList = data.join("<br/>");
-        }
-        catch (err) {
-            console.log(err);
-        }
-    });
+async function getFileList() {
+    try {
+        const data = await fs.readdir("."); // list of files
+        fileList = data.join("<br/>");
+    }
+    catch (err) {
+        console.log(err);
+    }
 }
 getFileList();
 /** Create HTTP server
@@ -82,7 +66,7 @@ getFileList();
  **/
 const server = http.createServer((req, res) => {
     console.log('---------------------------------------------------------------');
-    if (req.url === "/index.html") {
+    if (req.url === "/index.html" || req.url === "/") {
         // Set the response HTTP header with HTTP status and Content type
         res.writeHead(200, { 'Content-Type': 'text/html' });
         res.write('<html>' + endl);

@@ -1,4 +1,3 @@
-//# sourceMappingURL=client.js.map
 import * as net from "net"
 
 const client = net.createConnection({port:8124}, () => {

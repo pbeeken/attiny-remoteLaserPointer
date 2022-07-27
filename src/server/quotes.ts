@@ -1,10 +1,9 @@
-//# sourceMappingURL=quotes.js.map
 // Load modules
 import * as http from "http"
 import * as fs from "fs/promises"
 import * as net from "net"
 
-const hostname: string = "10.110.110.156" //"127.0.0.1"
+const hostname: string = "0.0.0.0" //"127.0.0.1"
 const port: number = 8000
 const endl: string = "\n\r"
 
@@ -75,7 +74,7 @@ getFileList()
 const server = http.createServer( (req, res) => {
     console.log('---------------------------------------------------------------')
 
-    if(req.url === "/index.html") {
+    if(req.url === "/index.html" || req.url === "/") {
         // Set the response HTTP header with HTTP status and Content type
         res.writeHead(200, { 'Content-Type': 'text/html' })
 

@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-//# sourceMappingURL=client.js.map
 const net = require("net");
 const client = net.createConnection({ port: 8124 }, () => {
     // connect!
