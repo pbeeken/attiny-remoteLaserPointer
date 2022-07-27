@@ -22,3 +22,8 @@ I have a server file which contains quotes in a text file. I read the file in to
 
 ## Growth
 Now that the work infrastructure is better developed pay attention to how the `eslinter` and `eslint-prettier` do their job. They will provide internal on the fly documentation. 
+
+## REST call experimentation
+remarkably easy parsing of query portion of url. Started with <abbr title="import * as querystring from 'node:querystring';">`querystring`</abbr> knowing it was legacy (I saw why immediately because the first term doesn't get the `?` stripped off.)  I moved to <abbr title="import * as url from 'node:url';">`url`</abbr> which produces a nice json structure from the response.
+
+Next trick is to move this to the Rasp $\!\pi$.
