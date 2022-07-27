@@ -37,7 +37,7 @@ async function main() {
       } else if (url.pathname.startsWith('/api')) {
         // REST call handling
         // browser side code: await fetch('/api').then(r => r.json())
-        response.end(JSON.stringify({ led: 'on' }) + '\n');
+        response.end(JSON.stringify({ led: 'on' }));
       } else {
         const fileData = await readFile(
           path.join(BASE_DIR, url.pathname.slice(1))
