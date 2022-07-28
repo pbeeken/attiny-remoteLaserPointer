@@ -35,4 +35,5 @@ I have to move between many platforms and machines I just want to outline the to
     - the above usually includes installation of <abbr title="node package installer">`npm`</abbr>  check versions
     - get <abbr title="node version manager">`nvm`</abbr> using: `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash`
   - setup vsCode by installing the `eslint` add-on
-  
+  - install typescript `sudo apt install node-typescript`
+  - use `npm` to update node type definitions `npm i -D @types/node`
