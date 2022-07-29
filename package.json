@@ -15,6 +15,22 @@
     "lint:fix": "npm run lint -- --fix",
     "start": "nodemon ./src/server/server.ts",
     "watch:build": "tsc -w",
-    "test": "ts-node test/index.js"
-  }
+    "test": "ts-node test/index.js",
+    "serve": "nohup nodemon --no-stdin ./src/server/server.ts &"
+  },
+  "private": true,
+  "name": "nodeapptrial",
+  "description": "This is an exploration of web app built on node. Eventually this will run on a Raspberry Pi",
+  "version": "0.8.0",
+  "main": "src/server/server.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pbeeken/nodeAppTrial.git"
+  },
+  "author": "Paul Beeken <pbeeken@knowsoft.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pbeeken/nodeAppTrial/issues"
+  },
+  "homepage": "https://github.com/pbeeken/nodeAppTrial#readme"
 }
