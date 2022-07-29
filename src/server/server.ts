@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /**
  * This file was made with a lot of help from Neal. The documentation contained within are my notes
@@ -14,6 +15,7 @@ import { on } from 'node:events';
 import * as path from 'node:path';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { handleApiRequest } from './api';
+import { inspect } from 'node:util';
 
 /**
  * Instead of creating all the operational elements (see quotes.ts) on the fly (lambda functions)
@@ -36,13 +38,32 @@ server.listen(80, '0.0.0.0', 128, () => {
  */
 const BASE_DIR = 'public';
 
+const readBody = async (
+    request: IncomingMessage
+): Promise<Record<string, any>> => {
+    const chunks = [];
+    for await (const chunk of request) {
+        chunks.push(chunk);
+    }
+    if (chunks.length === 0) {
+        return {};
+    }
+    try {
+        return JSON.parse(Buffer.concat(chunks).toString('utf8'));
+    } catch (error) {
+        return {
+            error: error instanceof Error ? error.message : 'unknown error',
+        };
+    }
+};
+
 /**
  * This is a key idea: provide our primary entry point as an async function so we can
  * implement await decorators that control what is critical vs what can be queued.
  * Tiny Change
  */
 async function main() {
-    /*                                      listen to the 'request' events to get the details for incoming requests */
+    /* listen to the 'request' events to get the details for incoming requests */
     const serverIterable = on(server, 'request') as AsyncIterable<
         [IncomingMessage, ServerResponse]
     >;
@@ -54,8 +75,15 @@ async function main() {
             `http://${request.headers.host}`
         );
 
+        const body = await readBody(request);
+
         /* report what we have so far. */
-        console.log(request.method, url.pathname, url.search);
+        console.log(
+            request.method,
+            url.pathname,
+            url.search,
+            inspect(body, { breakLength: Infinity, colors: true })
+        );
 
         try {
             /* handle the various request conditions from the connection TODO: review the http communications protocols just for context */
@@ -84,7 +112,7 @@ async function main() {
 
                 // marks the start of a REST call
             } else if (url.pathname.startsWith('/api')) {
-                const jsonRes = await handleApiRequest(url, request);
+                const jsonRes = await handleApiRequest(url, request, body);
                 // spit it back as feedback.
                 response.end(JSON.stringify(jsonRes));
             } else {

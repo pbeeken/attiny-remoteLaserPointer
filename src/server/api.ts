@@ -2,27 +2,15 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { IncomingMessage } from 'node:http';
-import { inspect } from 'node:util';
 import { updateServer } from './auto_update';
 import { setLEDIntensity } from './pi';
 
-const readBody = async (
-    request: IncomingMessage
-): Promise<Record<string, any>> => {
-    const chunks = [];
-    for await (const chunk of request) {
-        chunks.push(chunk);
-    }
-    return JSON.parse(Buffer.concat(chunks).toString('utf8'));
-};
-
-export const handleApiRequest = async (url: URL, request: IncomingMessage) => {
-    const queryString = Object.fromEntries(url.searchParams.entries());
-    const postData = request.method === 'POST' ? await readBody(request) : {};
-
-    console.log(
-        `  post: ${inspect(postData, { breakLength: Infinity, colors: true })}`
-    );
+export const handleApiRequest = async (
+    url: URL,
+    request: IncomingMessage,
+    postData: Record<string, any>
+) => {
+    // const queryString = Object.fromEntries(url.searchParams.entries());
 
     if (postData.serverUpdate) {
         await updateServer();
