@@ -40,3 +40,4 @@ I have to move between many platforms and machines I just want to outline the to
   - use `npm i` to update dependancies
   - [Get the i2c](https://www.npmjs.com/package/i2c) libraries
   
+Test connection to the pizero with `http://raspzero01.local:8080/`
