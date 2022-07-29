@@ -27,6 +27,7 @@ Now that the work infrastructure is better developed pay attention to how the `e
 remarkably easy parsing of query portion of url. Started with <abbr title="import * as querystring from 'node:querystring';">`querystring`</abbr> knowing it was legacy (I saw why immediately because the first term doesn't get the `?` stripped off.)  I moved to <abbr title="import * as url from 'node:url';">`url`</abbr> which produces a nice json structure from the response.
 
 Next trick is to move this to the Rasp $\!\pi$.
+> side note, works well from phone, not unexpected.
 
 ## Setup
 I have to move between many platforms and machines I just want to outline the tool chain for things needed or suggested so I can unify the operations.
@@ -36,4 +37,7 @@ I have to move between many platforms and machines I just want to outline the to
     - get <abbr title="node version manager">`nvm`</abbr> using: `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash`
   - setup vsCode by installing the `eslint` add-on
   - install typescript `sudo apt install node-typescript`
-  - use `npm` to update node type definitions `npm i -D @types/node`
+  - use `npm i` to update dependancies
+  - [Get the i2c](https://www.npmjs.com/package/i2c) libraries
+  
+Test connection to the pizero with `http://raspzero01.local:8080/`
