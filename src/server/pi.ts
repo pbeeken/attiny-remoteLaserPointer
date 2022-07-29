@@ -28,6 +28,14 @@ export const setLEDIntensity = async ({
 
     const bus = await i2cBus.openPromisified(1);
 
+    if (led === 'off') {
+        const intensityBuf = Buffer.alloc(2);
+        intensityBuf[0] = 'I'.charCodeAt(0);
+        intensityBuf[1] = 0x00;
+        await bus.i2cWrite(0x14, 2, intensityBuf);
+        return;
+    }
+
     const modeBuf = Buffer.alloc(2);
     modeBuf[0] = 'M'.charCodeAt(0);
     modeBuf[1] = mode.charCodeAt(0);

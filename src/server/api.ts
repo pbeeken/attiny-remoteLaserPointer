@@ -24,7 +24,7 @@ export const handleApiRequest = async (url: URL, request: IncomingMessage) => {
         `  post: ${inspect(postData, { breakLength: Infinity, colors: true })}`
     );
 
-    if (queryString.serverUpdate) {
+    if (postData.serverUpdate) {
         await updateServer();
         return { sure: true };
     }

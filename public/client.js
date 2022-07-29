@@ -1,4 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
+const rangeInput = document.getElementById('intensity');
+rangeInput.addEventListener('change', () => {
+    (async () => {
+        await toggleLED_POST('on');
+    })().catch(console.error);
+});
+
 function mode() {
     /** @type {HTMLInputElement} */
     const checkedButton = Array.from(
@@ -61,4 +69,14 @@ async function toggleLED_REST(state, intens) {
     url.searchParams.set('intensity', val);
     const resp = await fetch(url).then((r) => r.json());
     console.log('GET rsp:' + JSON.stringify(resp));
+}
+
+async function askUpdate() {
+    const options = {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ serverUpdate: true }),
+    };
+    const resp = await fetch(API_URL, options).then((r) => r.json());
+    console.log('update rsp:' + JSON.stringify(resp));
 }

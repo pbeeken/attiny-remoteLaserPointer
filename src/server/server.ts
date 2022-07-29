@@ -19,7 +19,7 @@ import { handleApiRequest } from './api';
  * Instead of creating all the operational elements (see quotes.ts) on the fly (lambda functions)
  * Build incrementally to compartmentalize the features.
  */
-
+const bootTime = new Date();
 /**
  * Create a server instance
  */
@@ -72,10 +72,15 @@ async function main() {
                 // Default page rquest without and explicit request for index.html
             } else if (url.pathname === '/') {
                 response.setHeader('content-type', 'text/html');
-                response.end(
-                    await readFile(path.join(BASE_DIR, 'index.html')),
-                    'utf8'
+                let indexHtml = await readFile(
+                    path.join(BASE_DIR, 'index.html'),
+                    { encoding: 'utf8' }
                 );
+                indexHtml = indexHtml.replace(
+                    '{{BOOT_TIME}}',
+                    `${bootTime.toLocaleDateString()} ${bootTime.toLocaleTimeString()}`
+                );
+                response.end(indexHtml, 'utf8');
 
                 // marks the start of a REST call
             } else if (url.pathname.startsWith('/api')) {
