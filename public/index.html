@@ -1,38 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💡</text></svg>">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💡</text></svg>">
     <title>Index</title>
     <style>
         .but {
-          border: none;
-          color: rgb(223, 223, 223);
-          padding: 15px 32px;
-          text-align: center;
-          text-decoration: none;
-          display: inline-block;
-          font-size: 16px;
-          margin: 4px 2px;
-          cursor: pointer;
+            border: none;
+            color: rgb(223, 223, 223);
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
         }
-        
-        .var1 {background-color: #4CAF50;} /* Green */
-        .var2 {background-color: #008CBA;} /* Blue */
+
+        .var1 {
+            background-color: #4CAF50;
+        }
+
+        /* Green */
+        .var2 {
+            background-color: #008CBA;
+        }
+
+        /* Blue */
     </style>
     <script>
         async function toggleLED(state) {
             let val = Math.floor(100 * Math.random())
-            const resp = await fetch('/api?' + 'led=' + state + '&' + 'other=' + val).then((r)=>r.json())
+            const reqApi = new URL('/api', window.location.href)
+            reqApi.searchParams.set('led', state)
+            reqApi.searchParams.set('other', val)
+            const resp = await fetch(reqApi).then(r => r.json())
             console.log('rsp:' + JSON.stringify(resp))
         }
     </script>
 </head>
+
 <body>
     <p>Hit a button, any button.</p>
     <button class="but var1" onclick="toggleLED('off')"><b>OFF</b></button>
     <button class="but var2" onclick="toggleLED('on')"><b>ON</b></button>
 </body>
+
 </html>

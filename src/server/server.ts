@@ -9,10 +9,10 @@
 import './auto_update';
 import { readFile } from 'node:fs/promises';
 import * as http from 'node:http';
-import * as url from 'node:url';
 import { on } from 'node:events';
 import * as path from 'node:path';
 import type { IncomingMessage, ServerResponse } from 'node:http';
+import { updateServer } from './auto_update';
 
 /**
  * Instead of creating all the operational elements (see quotes.ts) on the fly (lambda functions)
@@ -78,8 +78,15 @@ async function main() {
                 // REST call handling
                 // browser side code: await fetch('/api').then(r => r.json())
                 // const query = querystring.parse(theURL.search);
-                const theQuery = url.parse(theURL.search, true).query;
-                response.end(JSON.stringify(theQuery)); // spit it back as feedback.
+                const query = Object.fromEntries(theURL.searchParams.entries());
+
+                if (query.serverUpdate) {
+                    await updateServer();
+                    response.end(JSON.stringify({ sure: true }));
+                    continue;
+                }
+
+                response.end(JSON.stringify(query)); // spit it back as feedback.
 
                 // grab any file which matches the request
             } else {
