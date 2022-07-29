@@ -13,6 +13,7 @@ import { on } from 'node:events';
 import * as path from 'node:path';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { updateServer } from './auto_update';
+import { doPiThings } from './pi';
 
 /**
  * Instead of creating all the operational elements (see quotes.ts) on the fly (lambda functions)
@@ -84,6 +85,10 @@ async function main() {
                     await updateServer();
                     response.end(JSON.stringify({ sure: true }));
                     continue;
+                }
+
+                if (typeof query.led === 'string') {
+                    await doPiThings();
                 }
 
                 response.end(JSON.stringify(query)); // spit it back as feedback.
