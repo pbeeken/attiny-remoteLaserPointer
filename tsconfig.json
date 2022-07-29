@@ -1,14 +1,25 @@
 {
-    "compilerOptions": {
-      "target": "ES2020",
-      "module": "CommonJS",
-      "strict": true,
-      "sourceMap": true,
-      "outDir": "dist",
-      "types": ["node"],
-      "lib": ["DOM", "ES2020"],
-      "newLine": "lf"
-    },
-    "include": ["src/**/*"],
-    "exclude": ["dist/**/*"]
-  }
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "allowJs": true,
+    "strict": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "types": [
+      "node"
+    ],
+    "lib": [
+      "DOM",
+      "ES2020"
+    ],
+    "newLine": "lf"
+  },
+  "include": [
+    "src/**/*",
+    "public/**/*"
+  ],
+  "exclude": [
+    "dist/**/*"
+  ]
+}

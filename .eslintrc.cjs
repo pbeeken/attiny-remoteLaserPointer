@@ -1,4 +1,8 @@
+/** @type {import('eslint').ESLint.ConfigData} */
 module.exports = {
+    env: {
+        web: true,
+    },
     extends: [
         'eslint:recommended',
         'plugin:@typescript-eslint/recommended',
@@ -9,7 +13,7 @@ module.exports = {
     parserOptions: {
         tsconfigRootDir: __dirname,
         project: ['./tsconfig.json'],
-      },
+    },
     plugins: [
         '@typescript-eslint',
         'prettier'
@@ -18,4 +22,4 @@ module.exports = {
         'prettier/prettier': 'warn'
     },
     root: true,
-  };
+};

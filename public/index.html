@@ -32,16 +32,7 @@
 
         /* Blue */
     </style>
-    <script>
-        async function toggleLED(state) {
-            let val = Math.floor(100 * Math.random())
-            const reqApi = new URL('/api', window.location.href)
-            reqApi.searchParams.set('led', state)
-            reqApi.searchParams.set('other', val)
-            const resp = await fetch(reqApi).then(r => r.json())
-            console.log('rsp:' + JSON.stringify(resp))
-        }
-    </script>
+    <script src="client.js"></script>
 </head>
 
 <body>

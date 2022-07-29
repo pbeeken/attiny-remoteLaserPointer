@@ -12,8 +12,7 @@ import * as http from 'node:http';
 import { on } from 'node:events';
 import * as path from 'node:path';
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { updateServer } from './auto_update';
-import { doPiThings } from './pi';
+import { handleApiRequest } from './api';
 
 /**
  * Instead of creating all the operational elements (see quotes.ts) on the fly (lambda functions)
@@ -46,12 +45,12 @@ async function main() {
     // eslint-disable-next-line prettier/prettier
   for await (const [request, response] of on(server, 'request') as AsyncIterable<[IncomingMessage, ServerResponse]>) {
         // eslint-disable-next-line prettier/prettier
-    const theURL = new URL(request.url ?? '/', `http://${String(request.headers.host)}` ); /* parse the url for easier testing below */
+    const url = new URL(request.url ?? '/', `http://${String(request.headers.host)}` ); /* parse the url for easier testing below */
 
         console.log(
             request.method,
-            theURL.pathname,
-            theURL.search
+            url.pathname,
+            url.search
         ); /* report what we have so far. */
 
         try {
@@ -67,7 +66,7 @@ async function main() {
                 response.end();
 
                 // Default page rquest without and explicit request for index.html
-            } else if (theURL.pathname === '/') {
+            } else if (url.pathname === '/') {
                 response.setHeader('content-type', 'text/html');
                 response.end(
                     await readFile(path.join(BASE_DIR, 'index.html')),
@@ -75,32 +74,18 @@ async function main() {
                 );
 
                 // marks the start of a REST call
-            } else if (theURL.pathname.startsWith('/api')) {
-                // REST call handling
-                // browser side code: await fetch('/api').then(r => r.json())
-                // const query = querystring.parse(theURL.search);
-                const query = Object.fromEntries(theURL.searchParams.entries());
-
-                if (query.serverUpdate) {
-                    await updateServer();
-                    response.end(JSON.stringify({ sure: true }));
-                    continue;
-                }
-
-                if (typeof query.led === 'string') {
-                    await doPiThings();
-                }
-
-                response.end(JSON.stringify(query)); // spit it back as feedback.
-
-                // grab any file which matches the request
+            } else if (url.pathname.startsWith('/api')) {
+                const jsonRes = await handleApiRequest(url, request);
+                // spit it back as feedback.
+                response.end(JSON.stringify(jsonRes));
             } else {
+                // grab any file which matches the request
                 const fileData = await readFile(
-                    path.join(BASE_DIR, theURL.pathname.slice(1))
+                    path.join(BASE_DIR, url.pathname.slice(1))
                 );
 
                 // Get the extension
-                const fileParts = theURL.pathname.split('.');
+                const fileParts = url.pathname.split('.');
                 const fileExtension = fileParts[fileParts.length - 1]; // could also be .slice(-1)
 
                 if (fileExtension === 'js') {
