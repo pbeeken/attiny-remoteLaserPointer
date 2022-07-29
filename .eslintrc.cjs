@@ -1,7 +1,7 @@
 /** @type {import('eslint').ESLint.ConfigData} */
 module.exports = {
     env: {
-        web: true,
+        'browser': true
     },
     extends: [
         'eslint:recommended',

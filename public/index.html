@@ -8,37 +8,49 @@
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💡</text></svg>">
     <title>Index</title>
-    <style>
-        .but {
-            border: none;
-            color: rgb(223, 223, 223);
-            padding: 15px 32px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            cursor: pointer;
-        }
-
-        .var1 {
-            background-color: #4CAF50;
-        }
-
-        /* Green */
-        .var2 {
-            background-color: #008CBA;
-        }
-
-        /* Blue */
-    </style>
+    <link href="index.css" rel="stylesheet" type="text/css">
     <script src="client.js"></script>
 </head>
 
 <body>
     <p>Hit a button, any button.</p>
-    <button class="but var1" onclick="toggleLED('off')"><b>OFF</b></button>
-    <button class="but var2" onclick="toggleLED('on')"><b>ON</b></button>
+    <table>
+        <tr>
+            <td colspan="2">
+                <button class="but var1" onclick="toggleLED('off')"><b>OFF</b></button>
+            </td>
+            <td colspan="2">
+                <button class="but var2" onclick="toggleLED('on')"><b>ON</b></button>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4">
+                <fieldset>
+                    <legend>Mode</legend>
+                    <input type="radio" id="steady" name="led_mode" value="S" checked>
+                    <label for="steady">Steady</label>
+                    <input type="radio" id="blink" name="led_mode" value="B">
+                    <label for="blink">Blink</label>
+                    <input type="radio" id="pulse" name="led_mode" value="P">
+                    <label for="pulse">Pulsate</label>
+                </fieldset>
+            </td>
+        </tr>
+        <tr aria-colspan="4">
+            <td>
+                <fieldset>
+                    <legend>Period</legend>
+                    <input type="radio" id="hlfsec" name="led_freq" value="0" checked>
+                    <label for="hlfsec">0.5s</label>
+                    <input type="radio" id="fulsec" name="led_freq" value="1">
+                    <label for="fulsec">1.0s</label>
+                    <input type="radio" id="dblsec" name="led_freq" value="2">
+                    <label for="dblsec">2.0s</label>
+                </fieldset>
+                <input type="range" id="intensity" name="led_intensity" min="0" max="240" value="100" step="20">
+            </td>
+        </tr>
+    </table>
 </body>
 
 </html>

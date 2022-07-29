@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /**
  * This file was made with a lot of help from Neal. The documentation contained within are my notes
  * as I try to recollect the instructions and guidance from the next morning.
@@ -26,9 +27,9 @@ const server = http.createServer();
 /**
  * Add the listener (0.0.0.0) provides a universal reception space.
  */
-server.listen(8080, '0.0.0.0', 128, () =>
-    console.log('Listening on http://localhost:8080')
-);
+server.listen(80, '0.0.0.0', 128, () => {
+    console.log(`Listening on ${JSON.stringify(server.address())}`);
+});
 
 /**
  * localizes the place where templates and data is stored.
@@ -42,16 +43,19 @@ const BASE_DIR = 'public';
  */
 async function main() {
     /*                                      listen to the 'request' events to get the details for incoming requests */
-    // eslint-disable-next-line prettier/prettier
-  for await (const [request, response] of on(server, 'request') as AsyncIterable<[IncomingMessage, ServerResponse]>) {
-        // eslint-disable-next-line prettier/prettier
-    const url = new URL(request.url ?? '/', `http://${String(request.headers.host)}` ); /* parse the url for easier testing below */
+    const serverIterable = on(server, 'request') as AsyncIterable<
+        [IncomingMessage, ServerResponse]
+    >;
 
-        console.log(
-            request.method,
-            url.pathname,
-            url.search
-        ); /* report what we have so far. */
+    for await (const [request, response] of serverIterable) {
+        /* parse the url for easier testing below */
+        const url = new URL(
+            request.url ?? '/',
+            `http://${request.headers.host}`
+        );
+
+        /* report what we have so far. */
+        console.log(request.method, url.pathname, url.search);
 
         try {
             /* handle the various request conditions from the connection TODO: review the http communications protocols just for context */
@@ -99,6 +103,9 @@ async function main() {
                 }
                 if (fileExtension === 'map' || fileExtension === 'json') {
                     response.setHeader('content-type', 'application/json');
+                }
+                if (fileExtension === 'css') {
+                    response.setHeader('content-type', 'text/css');
                 }
                 if (fileExtension === 'html') {
                     response.setHeader('content-type', 'text/html');
