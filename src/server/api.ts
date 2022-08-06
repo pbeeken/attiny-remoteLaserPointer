@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { IncomingMessage } from 'node:http';
 import { updateServer } from './auto_update';
-import { setLEDIntensity } from './pi';
+import { setLEDModePeriod, setLEDIntensity, setLEDState } from './i2cControl';
 
 export const handleApiRequest = async (
     url: URL,
@@ -11,6 +11,7 @@ export const handleApiRequest = async (
     postData: Record<string, any>
 ) => {
     // const queryString = Object.fromEntries(url.searchParams.entries());
+    console.log(`handling request ${JSON.stringify(postData)}`);
 
     if (postData.serverUpdate) {
         await updateServer();
@@ -18,7 +19,10 @@ export const handleApiRequest = async (
     }
 
     if (typeof postData.led === 'string') {
-        await setLEDIntensity(postData as any);
+        await setLEDState(postData.led === 'ON');
+    } else {
+        await setLEDModePeriod(postData.mode, postData.period);
+        await setLEDIntensity(postData.intensity);
     }
 
     return {};

@@ -13,48 +13,53 @@
 
 <body>
     <p>Hit a button, any button.</p>
-    <table>
-        <tr>
-            <td colspan="2">
-                <button class="but var1" onclick="toggleLED('off')"><b>OFF</b></button>
-            </td>
-            <td colspan="2">
-                <button class="but var2" onclick="toggleLED('on')"><b>ON</b></button>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="4">
-                <fieldset>
-                    <legend>Mode</legend>
-                    <input type="radio" id="steady" name="led_mode" value="S" checked>
-                    <label for="steady">Steady</label>
-                    <input type="radio" id="blink" name="led_mode" value="B">
-                    <label for="blink">Blink</label>
-                    <input type="radio" id="pulse" name="led_mode" value="P">
-                    <label for="pulse">Pulsate</label>
-                </fieldset>
-            </td>
-        </tr>
-        <tr aria-colspan="4">
-            <td>
-                <fieldset>
-                    <legend>Period</legend>
-                    <input type="radio" id="hlfsec" name="led_freq" value="0" checked>
-                    <label for="hlfsec">0.5s</label>
-                    <input type="radio" id="fulsec" name="led_freq" value="1">
-                    <label for="fulsec">1.0s</label>
-                    <input type="radio" id="dblsec" name="led_freq" value="2">
-                    <label for="dblsec">2.0s</label>
-                </fieldset>
-                <input type="range" id="intensity" name="led_intensity" min="0" max="240" value="100" step="20">
-            </td>
-        </tr>
-    </table>
+    <div class="controls">
+        <button class="but off" onclick="sendLEDState_POST('off')"><b>OFF</b></button>
+        <button class="but on" onclick="sendLEDState_POST('on')"><b>ON</b></button>
+        <br /><br /><br />
+        <br /><br />
+        <fieldset id="fld mode">
+            <legend>Mode</legend>
+            <input type="radio" id="steady" name="led_mode" value="0" checked>
+            <label for="steady">Steady</label>
+            <input type="radio" id="blink" name="led_mode" value="1">
+            <label for="blink">Blink</label>
+            <input type="radio" id="pulse" name="led_mode" value="2">
+            <label for="pulse">Pulsate</label>
+        </fieldset>
+        <fieldset id="fld period">
+            <legend>Period</legend>
+            <input type="radio" id="64ms" name="led_period" value="0">
+            <label for="64ms">1/16s</label>
+            <input type="radio" id="125ms" name="led_period" value="1">
+            <label for="125ms">1/8s</label>
+            <input type="radio" id="250ms" name="led_period" value="2">
+            <label for="250ms">1/4s</label>
+            <input type="radio" id="500ms" name="led_period" value="3" checked>
+            <label for="500ms">1/2s</label>
+            <input type="radio" id="750ms" name="led_period" value="4">
+            <label for="750ms">3/4s</label><br />
+            <input type="radio" id="1000ms" name="led_period" value="5">
+            <label for="1000ms">1s</label>
+            <input type="radio" id="1500ms" name="led_period" value="6">
+            <label for="1500ms">1.5s</label>
+            <input type="radio" id="2000ms" name="led_period" value="7">
+            <label for="2000ms">2.0s</label>
+            <input type="radio" id="3000ms" name="led_period" value="8">
+            <label for="3000ms">3.0s</label>
+            <input type="radio" id="4000ms" name="led_period" value="9">
+            <label for="4000ms">4.0s</label>
+        </fieldset>
+        <fieldset id="fld intens">
+            <legend>Brightness</legend>
+            <input class="bright" type="range" id="intensity" name="led_intensity" min="0" max="240" value="100"
+                step="20">
+        </fieldset>
 
-    <footer>
-        <button class="but upd" onclick="askUpdate()"><b>Update Server</b></button>
-        <code>boot time: {{BOOT_TIME}}</code>
-    </footer>
+        <footer>
+            <button class="but upd" onclick="askUpdate()"><b>Update Server</b></button>
+            <span id="boot">boot time: {{BOOT_TIME}}</span>
+        </footer>
 </body>
 <script defer src="client.js"></script>
 
