@@ -64,7 +64,7 @@ export async function setLEDState(state: boolean) {
     const bus = await i2cBus.openPromisified(1);
     const i2cBuff = Buffer.alloc(2);
     i2cBuff[0] = 1; // internal address of mode/freq byte
-    i2cBuff[1] = state ? 0 : 1;
+    i2cBuff[1] = state ? 1 : 0;
     await bus.i2cWrite(0x14, 2, i2cBuff);
 }
 

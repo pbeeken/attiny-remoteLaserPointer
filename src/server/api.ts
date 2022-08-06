@@ -19,7 +19,7 @@ export const handleApiRequest = async (
     }
 
     if (typeof postData.led === 'string') {
-        await setLEDState(postData.led === 'ON');
+        await setLEDState(postData.led === 'on');
     } else {
         await setLEDModePeriod(postData.mode, postData.period);
         await setLEDIntensity(postData.intensity);
