@@ -76,7 +76,7 @@ async function sendLEDState_POST(state) {
  * Sends servo control information
  * @param {'on' | 'off'} state
  */
-async function sendServoCmd_POST() {
+ async function sendServoCmd_POST(state) {
     const options = {
         method: 'POST',
         headers: { 'content-type': 'application/json' },

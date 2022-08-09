@@ -40,10 +40,12 @@ export const handleApiRequest = async (
             if (postData.reset == 1) {
                 await PCA9685_reset();
                 await PCA9685_setPWMFreq(60);
+                await setServoDegree(0, 90); // vertical
+                await setServoDegree(1, 90); // horizontal
             }
         }
         if (postData.horiz) {
-            await setServoDegree(0, postData.horiz);
+            await setServoDegree(1, postData.horiz);
         }
         if (postData.vert) {
             await setServoDegree(0, postData.vert);
