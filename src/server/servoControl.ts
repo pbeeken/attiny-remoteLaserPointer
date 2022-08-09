@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
+import { setTimeout } from 'node:timers/promises';
+
 /**
  * This allows us to test commands using our development system
  * without exporting to the Pi
@@ -105,15 +107,19 @@ export async function PCA9685_setPWMFreq(freq: number) {
         console.log('  PCA9685_MODE1 reset write failed');
     });
 
-    //TODO: Delay 5ms
     // delay_ms(5);
-    // wrSensorReg8_8(PCA9685_MODE1, oldmode | 0xa0); //  This sets the MODE1 register to turn on auto increment.
-    wbuf[0] = PCA9685_MODE1;
-    wbuf[1] = oldMode | 0xa0;
-    await i2cObj.i2cWrite(PCA9685_ADDR, wbuf.length, wbuf).catch(() => {
-        console.log('  PCA9685_MODE1 redraw write failed');
+    await setTimeout(5, async () => {
+        // wrSensorReg8_8(PCA9685_MODE1, oldmode | 0xa0); //  This sets the MODE1 register to turn on auto increment.
+        wbuf[0] = PCA9685_MODE1;
+        wbuf[1] = oldMode | 0xa0;
+        await i2cObj.i2cWrite(PCA9685_ADDR, wbuf.length, wbuf).catch(() => {
+            console.log('  PCA9685_MODE1 redraw write failed');
+        });
     });
 }
+
+// const awaitTimeout = (delay: number) =>
+//     new Promise((resolve) => setTimeout(resolve, delay));
 
 export async function PCA9685_setPWM(n: number, on: number, off: number) {
     await loadI2C();
