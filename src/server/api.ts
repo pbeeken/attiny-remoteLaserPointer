@@ -8,8 +8,6 @@ import {
     PCA9685_reset,
     PCA9685_setPWMFreq,
     setServoDegree,
-    //   PCA9685_setPWM,
-    //   setServoPulse,
 } from './servoControl';
 
 export const handleApiRequest = async (
@@ -25,11 +23,31 @@ export const handleApiRequest = async (
         return { sure: true };
     }
 
-    if (typeof postData.led === 'string') {
-        await setLEDState(postData.led === 'on');
-    } else {
-        await setLEDModePeriod(postData.mode, postData.period);
-        await setLEDIntensity(postData.intensity);
+    if (postData.laser) {
+        if (typeof postData.led === 'string') {
+            await setLEDState(postData.led === 'on');
+        }
+        if (postData.mode) {
+            await setLEDModePeriod(postData.mode, postData.period);
+        }
+        if (postData.mode) {
+            await setLEDIntensity(postData.intensity);
+        }
+    }
+
+    if (postData.servo) {
+        if (postData.reset) {
+            if (postData.reset == 1) {
+                await PCA9685_reset();
+                await PCA9685_setPWMFreq(60);
+            }
+        }
+        if (postData.horiz) {
+            await setServoDegree(0, postData.horiz);
+        }
+        if (postData.vert) {
+            await setServoDegree(0, postData.vert);
+        }
     }
 
     return {};

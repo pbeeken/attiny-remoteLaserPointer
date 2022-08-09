@@ -60,10 +60,31 @@ async function sendLEDState_POST(state) {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
+            laser: 1,
             led: state,
             intensity: getIntensity(),
             mode: getMode(),
             period: getPeriod(),
+        }),
+    };
+    console.log('POST rsp:' + JSON.stringify(options));
+    const resp = await fetch(API_URL, options).then((r) => r.json());
+    console.log('POST rsp:' + JSON.stringify(resp));
+}
+
+/**
+ * Sends servo control information
+ * @param {'on' | 'off'} state
+ */
+async function sendServoCmd_POST() {
+    const options = {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+            servo: 1,
+            reset: 0,
+            horiz: 90,
+            vert: 90,
         }),
     };
     console.log('POST rsp:' + JSON.stringify(options));
