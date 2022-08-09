@@ -15,8 +15,20 @@ const fakeI2CModule: typeof import('i2c-bus') = {
         close: (...args: any[]) => {
             console.log('  close', args);
         },
+        i2cRead: (...args: any[]) => {
+            console.log('  i2cRead', args);
+        },
     }),
 } as any;
+
+/**
+ * This is the module that loads the module (real or fake)
+ */
+async function loadI2C() {
+    if (i2cBus == null) {
+        i2cBus = await import('i2c-bus').catch(() => fakeI2CModule);
+    }
+}
 
 /** Define the LED Settings */
 // interface LEDSettings {
@@ -30,7 +42,7 @@ const LASER_ADDR = 0x14;
 const REG_MODEPERIOD = 3;
 const REG_INTENSITY = 2;
 const REG_ONOFF = 1;
-const REG_RESET = 0;
+//const REG_RESET = 0;
 
 /**
  * The logic here is to collect the controls for the LaserPointer
@@ -39,25 +51,19 @@ const REG_RESET = 0;
  * export const setLEDIntensity = async (mode: number, period: number) => {}
  */
 export const setLEDModePeriod = async (mode: number, period: number) => {
-    if (i2cBus == null) {
-        i2cBus = await import('i2c-bus').catch(() => fakeI2CModule);
-    }
+    await loadI2C();
     console.log('setLEDModePeriod');
+
     mode = mode % 3; // limit values
     period = period % 10; // limit values
-    // const bus = await i2cBus.openPromisified(1);
-    // const i2cBuff = Buffer.alloc(2);
-    // i2cBuff[0] = REG_MODEPERIOD; // internal address of mode/freq byte
-    // i2cBuff[1] = (mode << 4) + period;
-    // await bus.i2cWrite(LASER_ADDR, 2, i2cBuff);
     const wbuf = Buffer.alloc(2);
 
     await i2cBus
         .openPromisified(1)
-        .then((i2cObj) => {
+        .then(async (i2cObj) => {
             wbuf[0] = REG_MODEPERIOD;
             wbuf[1] = (mode << 4) + period;
-            const bw = i2cObj.i2cWrite(LASER_ADDR, wbuf.length, wbuf);
+            await i2cObj.i2cWrite(LASER_ADDR, wbuf.length, wbuf);
         })
         .catch(() => {
             console.log('i2c ModeSet failed.');
@@ -65,23 +71,17 @@ export const setLEDModePeriod = async (mode: number, period: number) => {
 };
 
 export async function setLEDIntensity(value: number) {
-    if (i2cBus == null) {
-        i2cBus = await import('i2c-bus').catch(() => fakeI2CModule);
-    }
+    await loadI2C();
     console.log('setLEDIntensity');
-    // const bus = await i2cBus.openPromisified(1);
-    // const i2cBuff = Buffer.alloc(2);
-    // i2cBuff[0] = REG_INTENSITY; // internal address of mode/freq byte
-    // i2cBuff[1] = value;
-    // await bus.i2cWrite(LASER_ADDR, 2, i2cBuff);
+
     const wbuf = Buffer.alloc(2);
 
     await i2cBus
         .openPromisified(1)
-        .then((i2cObj) => {
+        .then(async (i2cObj) => {
             wbuf[0] = REG_INTENSITY;
             wbuf[1] = value;
-            const bw = i2cObj.i2cWrite(LASER_ADDR, wbuf.length, wbuf);
+            await i2cObj.i2cWrite(LASER_ADDR, wbuf.length, wbuf);
         })
         .catch(() => {
             console.log('i2c Intensity failed.');
@@ -89,65 +89,21 @@ export async function setLEDIntensity(value: number) {
 }
 
 export async function setLEDState(state: boolean) {
-    if (i2cBus == null) {
-        i2cBus = await import('i2c-bus').catch(() => fakeI2CModule);
-    }
+    await loadI2C();
     console.log('setLEDState');
-    // const bus = await i2cBus.openPromisified(1);
-    // const i2cBuff = Buffer.alloc(2);
-    // i2cBuff[0] = REG_ONOFF; // internal address of mode/freq byte
-    // i2cBuff[1] = state ? 1 : 0;
-    // await bus.i2cWrite(0x14, 2, i2cBuff);
+
     const wbuf = Buffer.alloc(2);
 
     await i2cBus
         .openPromisified(1)
-        .then((i2cObj) => {
+        .then(async (i2cObj) => {
             wbuf[0] = REG_ONOFF;
             wbuf[1] = state ? 1 : 0;
-            const bw = i2cObj.i2cWrite(LASER_ADDR, wbuf.length, wbuf);
+            await i2cObj.i2cWrite(LASER_ADDR, wbuf.length, wbuf);
         })
         .catch(() => {
             console.log('i2c State failed.');
         });
 }
-
-// export const setLEDOLDIntensity = async ({
-//     mode,
-//     intensity,
-//     period,
-//     ledState,
-// }: LEDSettings) => {
-//     if (i2cBus == null) {
-//         i2cBus = await import('i2c-bus').catch(() => fakeI2CModule);
-//     }
-
-//     const bus = await i2cBus.openPromisified(1);
-
-//     if (ledState === 'off') {
-//         const intensityBuf = Buffer.alloc(2);
-//         intensityBuf[0] = 1;
-//         intensityBuf[1] = 0x00;
-//         await bus.i2cWrite(0x14, 2, intensityBuf);
-//         return;
-//     }
-
-//     const modeBuf = Buffer.alloc(2);
-//     modeBuf[0] = 'M'.charCodeAt(0);
-//     modeBuf[1] = mode.charCodeAt(0);
-//     await bus.i2cWrite(0x14, 2, modeBuf);
-
-//     const intensityBuf = Buffer.alloc(2);
-//     intensityBuf[0] = 'I'.charCodeAt(0);
-//     intensityBuf[1] = intensity;
-//     await bus.i2cWrite(0x14, 2, intensityBuf);
-
-//     if (mode === 'B' || mode === 'P') {
-//         const periodBuf = Buffer.alloc(2);
-//         periodBuf[0] = 'P'.charCodeAt(0);
-//         periodBuf[1] = period.charCodeAt(0);
-//         await bus.i2cWrite(0x14, 2, periodBuf);
-//     }
-// };
 
 export const runningOnPi = () => process.env.USER === 'pi';
