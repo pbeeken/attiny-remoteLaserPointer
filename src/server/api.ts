@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { IncomingMessage } from 'node:http';
 import { updateServer } from './auto_update';
-import { setLEDModePeriod, setLEDIntensity, setLEDState } from './i2cControl';
+import { setLEDModePeriod, setLEDIntensity, setLEDState } from './laserControl';
 
 export const handleApiRequest = async (
     url: URL,
