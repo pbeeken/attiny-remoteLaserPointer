@@ -4,6 +4,13 @@
 import type { IncomingMessage } from 'node:http';
 import { updateServer } from './auto_update';
 import { setLEDModePeriod, setLEDIntensity, setLEDState } from './laserControl';
+import {
+    PCA9685_reset,
+    PCA9685_setPWMFreq,
+    setServoDegree,
+    PCA9685_setPWM,
+    setServoPulse,
+} from './servoControl';
 
 export const handleApiRequest = async (
     url: URL,
