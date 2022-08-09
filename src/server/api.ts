@@ -8,8 +8,8 @@ import {
     PCA9685_reset,
     PCA9685_setPWMFreq,
     setServoDegree,
-    PCA9685_setPWM,
-    setServoPulse,
+    //   PCA9685_setPWM,
+    //   setServoPulse,
 } from './servoControl';
 
 export const handleApiRequest = async (
@@ -33,4 +33,17 @@ export const handleApiRequest = async (
     }
 
     return {};
+};
+
+export const initializeServo = async () => {
+    await PCA9685_reset();
+    await PCA9685_setPWMFreq(60);
+};
+
+export const horzPos = async (angle: number) => {
+    await setServoDegree(0, angle);
+};
+
+export const vertPos = async (angle: number) => {
+    await setServoDegree(1, angle);
 };
