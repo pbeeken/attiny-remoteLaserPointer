@@ -194,7 +194,11 @@ export async function setServoPulse(n: number, pulse: number) {
     await PCA9685_setPWM(n, 0, pulse);
 }
 
-export function resetServoPointer() {
-    PCA9685_reset(); // Formal reset
-    PCA9685_setPWMFreq(60); // set the frequency
+export async function resetServoPointer() {
+    await PCA9685_reset().catch((e) => {
+        console.log(e);
+    }); // Formal reset
+    await PCA9685_setPWMFreq(60).catch((e) => {
+        console.log(e);
+    }); // set the frequency
 }
