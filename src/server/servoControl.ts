@@ -21,6 +21,10 @@ const fakeI2CModule: typeof import('i2c-bus') = {
         i2cRead: (...args: any[]) => {
             console.log('  i2cRead', args);
         },
+        readByte: (...args: any[]) => {
+            console.log('  readByte', args);
+            return 0xaa;
+        },
     }),
 } as any;
 
@@ -83,7 +87,9 @@ export async function PCA9685_setPWMFreq(freq: number) {
     // wrdSensorReg8_8(PCA9685_MODE1, &oldmode);
     const oldMode = await i2cObj
         .readByte(PCA9685_ADDR, PCA9685_MODE1)
-        .then((oldmode) => oldmode);
+        .then((m) => {
+            return m;
+        });
 
     // wrSensorReg8_8(PCA9685_MODE1, newmode); // go to sleep
     const newmode = (oldMode & 0x7f) | 0x10; // sleep
@@ -177,7 +183,7 @@ export async function setServoDegree(n: number, angle: number) {
 
 export async function setServoPulse(n: number, pulse: number) {
     await loadI2C();
-    console.log('setServoDegree');
+    console.log('setServoPulse');
 
     let pulselength = 1000.0; // 1,000 ms per second
     pulselength /= 60.0; // 60 Hz
@@ -186,4 +192,9 @@ export async function setServoPulse(n: number, pulse: number) {
     pulse /= pulselength;
     //     PCA9685_setPWM(n, 0, pulse);
     await PCA9685_setPWM(n, 0, pulse);
+}
+
+export function resetServoPointer() {
+    PCA9685_reset(); // Formal reset
+    PCA9685_setPWMFreq(60); // set the frequency
 }

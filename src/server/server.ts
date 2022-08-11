@@ -9,6 +9,8 @@
  * Imports of libraries and typedefs
  */
 import './auto_update';
+import { setLEDReset } from './laserControl';
+import { PCA9685_reset, PCA9685_setPWMFreq } from './servoControl';
 import { readFile } from 'node:fs/promises';
 import * as http from 'node:http';
 import { on } from 'node:events';
@@ -31,6 +33,15 @@ const server = http.createServer();
  */
 server.listen(80, '0.0.0.0', 128, () => {
     console.log(`Listening on ${JSON.stringify(server.address())}`);
+    setLEDReset().catch(() => {
+        console.log('LED reset failed');
+    });
+    PCA9685_reset().catch(() => {
+        console.log('Servo reset failed');
+    });
+    PCA9685_setPWMFreq(60).catch(() => {
+        console.log('Servo setPWMFreq failed');
+    });
 });
 
 /**

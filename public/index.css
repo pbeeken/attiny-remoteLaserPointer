@@ -15,6 +15,13 @@
     cursor: pointer;
 }
 
+/**
+#tickmarks {
+    display: inline-flex;
+    width: 300px;
+}
+**/
+
 .off {
     background-color: #4CAF50;
     float: left;
@@ -28,12 +35,18 @@
 
 .upd {
     background-color: peru;
+    font-size: 10px;
     float: left;
+}
 
+.rst {
+    background-color: peru;
+    font-size: 10px;
+    float: right;
 }
 
 .bright {
-    width: 90%;
+    width: 95%;
 }
 
 .fld {

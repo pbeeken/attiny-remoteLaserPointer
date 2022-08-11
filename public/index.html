@@ -52,12 +52,70 @@
         </fieldset>
         <fieldset id="fld intens">
             <legend>Brightness</legend>
-            <input class="bright" type="range" id="intensity" name="led_intensity" min="0" max="240" value="100"
-                step="20">
+            <input class="bright" type="range" id="intensity" name="led_intensity" min="0" max="100" value="0" step="5"
+                list="tickmarks">
+            <datalist id="tickmarks">
+                <!-- Add label option for named labels-->
+                <option value="0"></option>
+                <option value="10"></option>
+                <option value="20"></option>
+                <option value="30"></option>
+                <option value="40"></option>
+                <option value="50"></option>
+                <option value="60"></option>
+                <option value="70"></option>
+                <option value="80"></option>
+                <option value="90"></option>
+                <option value="100"></option>
+            </datalist>
         </fieldset>
 
+        <fieldset id="horiz position">
+            <legend>Horizontal</legend>
+            <input class="bright" type="range" id="horiz position" name="horiz_position" min="-50" max="50" value="0"
+                step="1" list="tickmarks">
+            <datalist id="tickmarks">
+                <!-- Add label option for named labels-->
+                <option value="-50"></option>
+                <option value="-40"></option>
+                <option value="-30"></option>
+                <option value="-20"></option>
+                <option value="-10"></option>
+                <option value="0"></option>
+                <option value="10"></option>
+                <option value="20"></option>
+                <option value="30"></option>
+                <option value="40"></option>
+                <option value="50"></option>
+            </datalist>
+        </fieldset>
+
+        <fieldset id="vert position">
+            <legend>Vertical</legend>
+            <input class="bright" type="range" id="vert position" name="vert_position" min="-50" max="50" value="0"
+                step="1" list="tickmarks">
+            <datalist id="tickmarks">
+                <!-- Add label option for named labels-->
+                <option value="-50"></option>
+                <option value="-40"></option>
+                <option value="-30"></option>
+                <option value="-20"></option>
+                <option value="-10"></option>
+                <option value="0"></option>
+                <option value="10"></option>
+                <option value="20"></option>
+                <option value="30"></option>
+                <option value="40"></option>
+                <option value="50"></option>
+            </datalist>
+        </fieldset>
+
+
         <footer>
-            <button class="but upd" onclick="askUpdate()"><b>Update Server</b></button>
+            <div class="controls">
+                <button class="but upd" onclick="askUpdate()">Update Server</button>
+                <button class="but rst" onclick="sendServoCmd_POST('reset')">Reset Servo</button>
+            </div>
             <span id="boot">boot time: {{BOOT_TIME}}</span>
         </footer>
 </body>

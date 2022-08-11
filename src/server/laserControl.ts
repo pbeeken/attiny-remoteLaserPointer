@@ -42,7 +42,25 @@ const LASER_ADDR = 0x14;
 const REG_MODEPERIOD = 3;
 const REG_INTENSITY = 2;
 const REG_ONOFF = 1;
-//const REG_RESET = 0;
+const REG_RESET = 0;
+
+export const setLEDReset = async () => {
+    await loadI2C();
+    console.log('setLEDReset');
+
+    const wbuf = Buffer.alloc(2);
+
+    await i2cBus
+        .openPromisified(1)
+        .then(async (i2cObj) => {
+            wbuf[0] = REG_RESET;
+            wbuf[1] = 7;
+            await i2cObj.i2cWrite(LASER_ADDR, wbuf.length, wbuf);
+        })
+        .catch(() => {
+            console.log('i2c Reset failed.');
+        });
+};
 
 /**
  * The logic here is to collect the controls for the LaserPointer
