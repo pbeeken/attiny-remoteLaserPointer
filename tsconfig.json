@@ -17,7 +17,8 @@
   },
   "include": [
     "src/**/*",
-    "public/**/*"
+    "public/**/*",
+    "experimental/*"
   ],
   "exclude": [
     "dist/**/*"
