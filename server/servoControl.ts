@@ -7,22 +7,25 @@ import { setTimeout } from 'node:timers/promises';
  * This allows us to test commands using our development system
  * without exporting to the Pi
  */
-
 let i2cBus: typeof import('i2c-bus') = null as any;
 const fakeI2CModule: typeof import('i2c-bus') = {
     // eslint-disable-next-line @typescript-eslint/require-await
     openPromisified: async () => ({
-        i2cWrite: (...args: any[]) => {
-            console.log('  i2cWrite', args);
+        i2cWrite: (addr: number, len: number, buf: Array<number>) => {
+            console.log(
+                `  i2cWrite: ${addr}:${buf[0]} ${len}<${buf[len - 1]}>`
+            );
+        },
+        i2cRead: (addr: number, len: number, buf: Array<number>) => {
+            console.log(`  i2cRead: ${addr}:${buf[0]} ${len}<${buf[len - 1]}>`);
+            buf[len - 1] = 0xaa;
+            return len;
         },
         close: (...args: any[]) => {
             console.log('  close', args);
         },
-        i2cRead: (...args: any[]) => {
-            console.log('  i2cRead', args);
-        },
-        readByte: (...args: any[]) => {
-            console.log('  readByte', args);
+        readByte: (addr: number, cmd: number) => {
+            console.log(`  readByte: ${addr}:${cmd}`);
             return 0xaa;
         },
     }),
@@ -65,6 +68,27 @@ export async function PCA9685_reset() {
         });
 }
 
+async function readByte(addr: number, cmd: number): Promise<number> {
+    await loadI2C();
+    console.log('readByte');
+
+    const wbuf = Buffer.alloc(1);
+    const rbuf = Buffer.alloc(1);
+
+    await i2cBus
+        .openPromisified(1)
+        .then(async (i2cObj) => {
+            wbuf[0] = cmd;
+            await i2cObj.i2cWrite(addr, wbuf.length, wbuf);
+            await i2cObj.i2cRead(addr, rbuf.length, rbuf);
+        })
+        .catch((err) => {
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            console.log(`   i2c readByte failed. ${err}`);
+        });
+    return Promise.resolve(rbuf[0]);
+}
+
 export async function PCA9685_setPWMFreq(freq: number) {
     freq *= 0.9; // Correct for overshoot in the frequency setting.
     let prescaleval = 25000000;
@@ -85,11 +109,16 @@ export async function PCA9685_setPWMFreq(freq: number) {
         });
 
     // wrdSensorReg8_8(PCA9685_MODE1, &oldmode);
-    const oldMode = await i2cObj
-        .readByte(PCA9685_ADDR, PCA9685_MODE1)
-        .then((m) => {
-            return m;
-        });
+    const oldMode = await readByte(PCA9685_ADDR, PCA9685_MODE1).then(
+        (rc: number) => {
+            return rc;
+        }
+    );
+    // const oldMode = await i2cObj
+    //     .readByte(PCA9685_ADDR, PCA9685_MODE1)
+    //     .then((m) => {
+    //         return m;
+    //     });
 
     // wrSensorReg8_8(PCA9685_MODE1, newmode); // go to sleep
     const newmode = (oldMode & 0x7f) | 0x10; // sleep

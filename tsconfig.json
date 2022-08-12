@@ -16,9 +16,9 @@
     "newLine": "lf"
   },
   "include": [
-    "src/**/*",
-    "public/**/*",
-    "experimental/*"
+    "server/*",
+    "public/*",
+    "experimental/*",
   ],
   "exclude": [
     "dist/**/*"

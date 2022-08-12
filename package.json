@@ -11,18 +11,18 @@
     "typescript": "^4.7.4"
   },
   "scripts": {
-    "lint": "eslint -f unix --ext '.ts' src",
+    "lint": "eslint -f unix --ext '.ts' server",
     "lint:fix": "npm run lint -- --fix",
-    "start": "nodemon ./src/server/server.ts",
+    "start": "nodemon ./server/server.ts",
     "watch:build": "tsc -w",
     "test": "ts-node test/index.js",
-    "serve": "nohup nodemon --no-stdin ./src/server/server.ts &"
+    "serve": "nohup nodemon --no-stdin ./server.ts &"
   },
   "private": true,
   "name": "nodeapptrial",
   "description": "This is an exploration of web app built on node. Eventually this will run on a Raspberry Pi",
   "version": "0.8.0",
-  "main": "src/server/server.ts",
+  "main": "server/server.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/pbeeken/nodeAppTrial.git"
