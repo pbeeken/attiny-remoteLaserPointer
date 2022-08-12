@@ -1,42 +1,40 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { I2CBus, i2cReadByte, loadI2C } from './commontools';
+import type { ModeControl } from './commontools';
 
 /**
  * This allows us to test commands using our development system
  * without exporting to the Pi
  */
-let i2cBus: typeof import('i2c-bus') = null as any;
-const fakeI2CModule: typeof import('i2c-bus') = {
-    // eslint-disable-next-line @typescript-eslint/require-await
-    openPromisified: async () => ({
-        i2cWrite: (addr: number, len: number, buf: Array<number>) => {
-            console.log(
-                `  i2cWrite: ${addr}:${buf[0]} ${len}<${buf[len - 1]}>`
-            );
-        },
-        i2cRead: (addr: number, len: number, buf: Array<number>) => {
-            console.log(`  i2cRead: ${addr}:${buf[0]} ${len}<${buf[len - 1]}>`);
-            buf[len - 1] = 0xaa;
-            return len;
-        },
-        close: (...args: any[]) => {
-            console.log('  close', args);
-        },
-        readByte: (addr: number, cmd: number) => {
-            console.log(` readByte: ${addr}:${cmd}`);
-            return 0xaa;
-        },
-    }),
-} as any;
+// let i2cBus: typeof import('i2c-bus') = null as any;
+// const fakeI2CModule: typeof import('i2c-bus') = {
+//     // eslint-disable-next-line @typescript-eslint/require-await
+//     openPromisified: async () => ({
+//         i2cWrite: (addr: number, len: number, buf: Array<number>) => {
+//             console.log(
+//                 `  i2cWrite: ${addr}:${buf[0]} ${len}<${buf[len - 1]}>`
+//             );
+//         },
+//         i2cRead: (addr: number, len: number, buf: Array<number>) => {
+//             console.log(`  i2cRead: ${addr}:${buf[0]} ${len}<${buf[len - 1]}>`);
+//             buf[len - 1] = 0xaa;
+//             return len;
+//         },
+//         close: (...args: any[]) => {
+//             console.log('  close', args);
+//         },
+//     }),
+// } as any;
 
 /**
  * This is the module that loads the module (real or fake)
  */
-async function loadI2C() {
-    if (i2cBus == null) {
-        i2cBus = await import('i2c-bus').catch(() => fakeI2CModule);
-    }
-}
+// async function loadI2C() {
+//     if (i2cBus == null) {
+//         i2cBus = await import('i2c-bus').catch(() => fakeI2CModule);
+//     }
+// }
 
 /** Define the LED Settings */
 // interface LEDSettings {
@@ -52,14 +50,16 @@ const REG_INTENSITY = 2;
 const REG_ONOFF = 1;
 const REG_RESET = 0;
 
+/**
+ * Reset the i2c control for the laser/led to initial state.
+ */
 export const setLEDReset = async () => {
     await loadI2C();
     console.log('setLEDReset');
 
     const wbuf = Buffer.alloc(2);
 
-    await i2cBus
-        .openPromisified(1)
+    await I2CBus.openPromisified(1)
         .then(async (i2cObj) => {
             wbuf[0] = REG_RESET;
             wbuf[1] = 7;
@@ -69,30 +69,26 @@ export const setLEDReset = async () => {
             console.log('LED Reset failed.');
         });
     // TEMP FOR TESTING
-    await getLEDModePeriod().then((val) => {
-        console.log(`  getLEDModePeriod returned: ${val[0]} ${val[1]}`);
-    });
+    // await getLEDModePeriod().then((val) => {
+    //     console.log(`  getLEDModePeriod returned: ${val[0]} ${val[1]}`);
+    // });
 };
 
 /**
- * The logic here is to collect the controls for the LaserPointer
- * Into modules that manage the individual controls
- * The other way to declare this method is to use:
- * export const setLEDIntensity = async (mode: number, period: number) => {}
+ * Set the mode and the period. Note that the period only makes sense for the blink/pulse modes.
  */
-export const setLEDModePeriod = async (mode: number, period: number) => {
+export const setLEDModePeriod = async (modeObj: ModeControl) => {
     await loadI2C();
     console.log('setLEDModePeriod');
 
-    mode = mode % 3; // limit values
-    period = period % 10; // limit values
+    modeObj.mode = modeObj.mode % 3; // limit values
+    modeObj.period = modeObj.period % 10; // limit values
     const wbuf = Buffer.alloc(2);
 
-    await i2cBus
-        .openPromisified(1)
+    await I2CBus.openPromisified(1)
         .then(async (i2cObj) => {
             wbuf[0] = REG_MODEPERIOD;
-            wbuf[1] = (mode << 4) + period;
+            wbuf[1] = (modeObj.mode << 4) + modeObj.period;
             await i2cObj.i2cWrite(LASER_ADDR, wbuf.length, wbuf);
         })
         .catch(() => {
@@ -106,8 +102,7 @@ export const setLEDIntensity = async (value: number) => {
 
     const wbuf = Buffer.alloc(2);
 
-    await i2cBus
-        .openPromisified(1)
+    await I2CBus.openPromisified(1)
         .then(async (i2cObj) => {
             wbuf[0] = REG_INTENSITY;
             wbuf[1] = value;
@@ -124,8 +119,7 @@ export const setLEDState = async (state: boolean) => {
 
     const wbuf = Buffer.alloc(2);
 
-    await i2cBus
-        .openPromisified(1)
+    await I2CBus.openPromisified(1)
         .then(async (i2cObj) => {
             wbuf[0] = REG_ONOFF;
             wbuf[1] = state ? 1 : 0;
@@ -136,52 +130,52 @@ export const setLEDState = async (state: boolean) => {
         });
 };
 
-async function readByte(addr: number, cmd: number): Promise<number> {
-    await loadI2C();
-    console.log('readByte');
-
-    const wbuf = Buffer.alloc(1);
-    const rbuf = Buffer.alloc(1);
-
-    await i2cBus
-        .openPromisified(1)
-        .then(async (i2cObj) => {
-            wbuf[0] = cmd;
-            await i2cObj.i2cWrite(addr, wbuf.length, wbuf);
-            await i2cObj.i2cRead(addr, rbuf.length, rbuf);
-        })
-        .catch((err) => {
-            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-            console.log(`   i2c readByte failed. ${err}`);
-        });
-    return Promise.resolve(rbuf[0]);
-}
-
-export const getLEDModePeriod = async (): Promise<Array<number>> => {
+/**
+ * getter for the mode/period value of the device.
+ * @returns ModeControl object
+ */
+export const getLEDModePeriod = async (): Promise<ModeControl> => {
     // await loadI2C();
     console.log('getLEDModePeriod');
 
-    // const wbuf = Buffer.alloc(1);
-    // const rbuf = Buffer.alloc(1);
-
-    // await i2cBus
-    //     .openPromisified(1)
-    //     .then(async (i2cObj) => {
-    //         wbuf[0] = REG_MODEPERIOD;
-    //         await i2cObj
-    //             .i2cWrite(LASER_ADDR, wbuf.length, wbuf)
-    //             .then(async () => {
-    //                 await i2cObj.i2cRead(LASER_ADDR, rbuf.length, rbuf);
-    //             });
-    //     })
-    //     .catch(() => {
-    //         console.log('i2c ModeSet failed.');
-    //     });
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    const val = await readByte(LASER_ADDR, REG_MODEPERIOD).then((rc: number) => {
-        return rc;
-    });
-    return [val >> 4, val & 0x0f];
+    const val: number = await i2cReadByte(LASER_ADDR, REG_MODEPERIOD).then(
+        (rc: number) => {
+            return rc;
+        }
+    );
+    return { mode: val >> 4, period: val & 0x0f };
 };
 
-export const runningOnPi = () => process.env.USER === 'pi';
+/**
+ * getter for the intensity value of the device.
+ * @returns 0-255 relative intensity
+ */
+export const getLEDIntensity = async (): Promise<number> => {
+    console.log('getLEDIntensity');
+    const val: number = await i2cReadByte(LASER_ADDR, REG_INTENSITY).then(
+        (rc: number) => {
+            return rc;
+        }
+    );
+    return val;
+};
+
+/**
+ * getter for the on/off state of the device.
+ * @returns 0|1 off|on
+ */
+export const getLEDState = async (): Promise<number> => {
+    console.log('getLEDState');
+    const val: number = await i2cReadByte(LASER_ADDR, REG_ONOFF).then(
+        (rc: number) => {
+            return rc;
+        }
+    );
+    return val;
+};
+
+export async function resetLaserPointer() {
+    await setLEDReset().catch((e) => {
+        console.log(e);
+    }); // set the frequency
+}

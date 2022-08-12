@@ -18,7 +18,6 @@
   "include": [
     "server/*",
     "public/*",
-    "experimental/*",
   ],
   "exclude": [
     "dist/**/*"
