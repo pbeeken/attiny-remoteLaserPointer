@@ -9,11 +9,13 @@ export let I2CBus: typeof import('i2c-bus') = null as any;
 export const fakeI2CModule: typeof import('i2c-bus') = {
     // eslint-disable-next-line @typescript-eslint/require-await
     openPromisified: async () => ({
+        // eslint-disable-next-line @typescript-eslint/require-await
         i2cWrite: async (addr: number, len: number, buf: Array<number>) => {
             console.log(
                 `  i2cWrite: ${addr}:${buf[0]} ${len}<${buf[len - 1]}>`
             );
         },
+        // eslint-disable-next-line @typescript-eslint/require-await
         i2cRead: async (addr: number, len: number, buf: Array<number>) => {
             console.log(`  i2cRead: ${addr}:${buf[0]} ${len}<${buf[len - 1]}>`);
             buf[len - 1] = 0xaa;
@@ -58,17 +60,11 @@ export async function i2cReadByte(addr: number, cmd: number): Promise<number> {
     const wbuf = Buffer.from([0]);
     const rbuf = Buffer.from([0]);
 
-    await I2CBus.openPromisified(1)
-        .then(async (i2cObj) => {
-            wbuf[0] = cmd;
-            await i2cObj.i2cWrite(addr, wbuf.length, wbuf);
-            await i2cObj.i2cRead(addr, rbuf.length, rbuf);
-        })
-        .catch(() => {
-            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-            throw new Error(`   i2c readByte failed.`);
-        });
-    return Promise.resolve(rbuf[0]);
+    const i2cObj = await I2CBus.openPromisified(1);
+    wbuf[0] = cmd;
+    await i2cObj.i2cWrite(addr, wbuf.byteLength, wbuf);
+    await i2cObj.i2cRead(addr, rbuf.byteLength, rbuf);
+    return rbuf[0];
 }
 
 export const runningOnPi = () => process.env.USER === 'pi';

@@ -4,43 +4,6 @@
 import { setTimeout } from 'node:timers/promises';
 import { I2CBus, i2cReadByte, loadI2C } from './commontools';
 
-/**
- * This allows us to test commands using our development system
- * without exporting to the Pi
- */
-// let i2cBus: typeof import('i2c-bus') = null as any;
-// const fakeI2CModule: typeof import('i2c-bus') = {
-//     // eslint-disable-next-line @typescript-eslint/require-await
-//     openPromisified: async () => ({
-//         i2cWrite: (addr: number, len: number, buf: Array<number>) => {
-//             console.log(
-//                 `  i2cWrite: ${addr}:${buf[0]} ${len}<${buf[len - 1]}>`
-//             );
-//         },
-//         i2cRead: (addr: number, len: number, buf: Array<number>) => {
-//             console.log(`  i2cRead: ${addr}:${buf[0]} ${len}<${buf[len - 1]}>`);
-//             buf[len - 1] = 0xaa;
-//             return len;
-//         },
-//         close: (...args: any[]) => {
-//             console.log('  close', args);
-//         },
-//         readByte: (addr: number, cmd: number) => {
-//             console.log(`  readByte: ${addr}:${cmd}`);
-//             return 0xaa;
-//         },
-//     }),
-// } as any;
-
-/**
- * This is the module that loads the module (real or fake)
- */
-// async function loadI2C() {
-//     if (i2cBus == null) {
-//         i2cBus = await import('i2c-bus').catch(() => fakeI2CModule);
-//     }
-// }
-
 // TODO: Check these registers
 const PCA9685_ADDR = 0x40;
 const PCA9685_MODE1 = 0x0;
@@ -57,16 +20,34 @@ export async function PCA9685_reset() {
     console.log('PCA9685_reset');
     const wbuf = Buffer.alloc(2);
 
-    await I2CBus.openPromisified(1)
-        .then(async (i2cObj) => {
-            wbuf[0] = PCA9685_MODE1;
-            wbuf[1] = 0x80;
-            await i2cObj.i2cWrite(PCA9685_ADDR, wbuf.length, wbuf);
-            await i2cObj.close();
-        })
-        .catch(() => {
-            console.log('PCA9685_reset failed.');
-        });
+    /**
+     *   let i2cObj;
+     *   let error;
+     *   try {
+     *       i2cObj = await I2CBus.openPromisified(1);
+     *       error = null;
+     *   } catch (openPromisifiedError) {
+     *       error = openPromisifiedError;
+     *       i2cObj = null;
+     *   }
+     *
+     *   if (error != null) {
+     *       console.log(error);
+     *   } else if (i2cObj != null) {
+     *       wbuf[0] = PCA9685_MODE1;
+     *       wbuf[1] = 0x80;
+     *       await i2cObj.i2cWrite(PCA9685_ADDR, wbuf.length, wbuf);
+     *       await i2cObj.close();
+     *   } else {
+     *       throw new Error();
+     *   }
+     */
+
+    const i2cObj = await I2CBus.openPromisified(1);
+    wbuf[0] = PCA9685_MODE1;
+    wbuf[1] = 0x80;
+    await i2cObj.i2cWrite(PCA9685_ADDR, wbuf.length, wbuf);
+    await i2cObj.close();
 }
 
 /**
@@ -78,30 +59,16 @@ export async function PCA9685_setPWMFreq(freq: number) {
     console.log('PCA9685_setPWMFreq');
     const wbuf = Buffer.alloc(2);
 
-    const i2cObj = await I2CBus.openPromisified(1)
-        .then((rc) => {
-            return rc;
-        })
-        .catch((_) => {
-            throw new Error(`  openPromisified failed.`);
-        });
+    const i2cObj = await I2CBus.openPromisified(1);
 
     // wrdSensorReg8_8(PCA9685_MODE1, &oldmode);
-    const oldMode: number = await i2cReadByte(PCA9685_ADDR, PCA9685_MODE1)
-        .then((rc: number) => {
-            return rc;
-        })
-        .catch(() => {
-            throw new Error('  PCA9685_MODE1 read failed');
-        });
+    const oldMode: number = await i2cReadByte(PCA9685_ADDR, PCA9685_MODE1);
 
     // wrSensorReg8_8(PCA9685_MODE1, newmode); // go to sleep
     const newmode = (oldMode & 0x7f) | 0x10; // sleep
     wbuf[0] = PCA9685_MODE1;
     wbuf[1] = newmode;
-    await i2cObj.i2cWrite(PCA9685_ADDR, wbuf.length, wbuf).catch(() => {
-        throw new Error('  PCA9685_MODE1 write failed');
-    });
+    await i2cObj.i2cWrite(PCA9685_ADDR, wbuf.length, wbuf);
 
     // wrSensorReg8_8(PCA9685_PRESCALE, prescale); // set the prescaler
     freq *= 0.9; // Correct for overshoot in the frequency setting.
@@ -112,25 +79,19 @@ export async function PCA9685_setPWMFreq(freq: number) {
     const prescale = Math.floor(prescalevel + 0.5);
     wbuf[0] = PCA9685_PRESCALE;
     wbuf[1] = prescale;
-    await i2cObj.i2cWrite(PCA9685_ADDR, wbuf.length, wbuf).catch(() => {
-        throw new Error('  PCA9685_PRESCALE write failed');
-    });
+    await i2cObj.i2cWrite(PCA9685_ADDR, wbuf.length, wbuf);
 
     // wrSensorReg8_8(PCA9685_MODE1, oldmode);
     wbuf[0] = PCA9685_MODE1;
     wbuf[1] = oldMode;
-    await i2cObj.i2cWrite(PCA9685_ADDR, wbuf.length, wbuf).catch(() => {
-        throw new Error('  PCA9685_MODE1 reset write failed');
-    });
+    await i2cObj.i2cWrite(PCA9685_ADDR, wbuf.length, wbuf);
 
     // delay_ms(5);
     await setTimeout(5, async () => {
         // wrSensorReg8_8(PCA9685_MODE1, oldmode | 0xa0); //  This sets the MODE1 register to turn on auto increment.
         wbuf[0] = PCA9685_MODE1;
         wbuf[1] = oldMode | 0xa0;
-        await i2cObj.i2cWrite(PCA9685_ADDR, wbuf.length, wbuf).catch(() => {
-            throw new Error('  PCA9685_MODE1 redraw write failed');
-        });
+        await i2cObj.i2cWrite(PCA9685_ADDR, wbuf.length, wbuf);
     });
 }
 
@@ -139,58 +100,46 @@ export async function PCA9685_setPWM(n: number, on: number, off: number) {
     console.log('PCA9685_setPWM');
     const wbuf = Buffer.alloc(2);
 
-    const i2cObj = await I2CBus.openPromisified(1)
-        .then((i2cObj) => i2cObj)
-        .catch(() => {
-            throw Error('PCA9685_setPWM failed');
-        });
+    const i2cObj = await I2CBus.openPromisified(1);
 
     //     wrSensorReg8_8(LED0_ON_L+4*num, on);
     wbuf[0] = LED0_ON_L + 4 * n;
     wbuf[1] = on & 0xff;
-    await i2cObj.i2cWrite(PCA9685_ADDR, wbuf.length, wbuf).catch(() => {
-        throw Error('PCA9685_setPWM write A failed');
-    });
+    await i2cObj.i2cWrite(PCA9685_ADDR, wbuf.length, wbuf);
 
     //     wrSensorReg8_8(LED0_ON_L+4*num + 1, on>>8);
     wbuf[0] = LED0_ON_L + 4 * n + 1;
     wbuf[1] = (on >> 8) & 0xff;
-    await i2cObj.i2cWrite(PCA9685_ADDR, wbuf.length, wbuf).catch(() => {
-        console.log('PCA9685_setPWM write B failed');
-    });
+    await i2cObj.i2cWrite(PCA9685_ADDR, wbuf.length, wbuf);
 
     //     wrSensorReg8_8(LED0_ON_L+4*num + 2, off);
     wbuf[0] = LED0_ON_L + 4 * n + 2;
     wbuf[1] = off & 0xff;
-    await i2cObj.i2cWrite(PCA9685_ADDR, wbuf.length, wbuf).catch(() => {
-        console.log('PCA9685_setPWM write B failed');
-    });
+    await i2cObj.i2cWrite(PCA9685_ADDR, wbuf.length, wbuf);
 
     //     wrSensorReg8_8(LED0_ON_L+4*num + 3, off>>8);
     wbuf[0] = LED0_ON_L + 4 * n + 3;
     wbuf[1] = (off >> 8) & 0xff;
-    await i2cObj.i2cWrite(PCA9685_ADDR, wbuf.length, wbuf).catch(() => {
-        console.log('PCA9685_setPWM write B failed');
-    });
+    await i2cObj.i2cWrite(PCA9685_ADDR, wbuf.length, wbuf);
 }
 
 export async function setServoDegree(n: number, angle: number) {
     await loadI2C();
     console.log('setServoDegree');
 
+    // copied directly from the c code.
     if (angle > 180.0) angle = 180.0;
     if (angle < 0.0) angle = 0.0;
     const pulse = (angle + 45.0) / (90.0 * 1000);
 
-    await setServoPulse(n, pulse).catch(() => {
-        console.log('setServoDegree failed');
-    });
+    await setServoPulse(n, pulse);
 }
 
 export async function setServoPulse(n: number, pulse: number) {
     await loadI2C();
     console.log('setServoPulse');
 
+    // copied directly from the c code.
     let pulselength = 1000.0; // 1,000 ms per second
     pulselength /= 60.0; // 60 Hz
     pulselength /= 4096.0;
@@ -201,10 +150,6 @@ export async function setServoPulse(n: number, pulse: number) {
 }
 
 export async function resetServoPointer() {
-    await PCA9685_reset().catch((e) => {
-        console.log(e);
-    }); // Formal reset
-    await PCA9685_setPWMFreq(60).catch((e) => {
-        console.log(e);
-    }); // set the frequency
+    await PCA9685_reset();
+    await PCA9685_setPWMFreq(60); // set the frequency
 }
