@@ -18,6 +18,7 @@
   "include": [
     "server/*",
     "public/*",
+    "server/servoControl.js",
   ],
   "exclude": [
     "dist/**/*"

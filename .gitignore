@@ -1,5 +1,6 @@
 # no js files
-*.js, *.js.map
+.js
+.js.map
 
 # don't bother with dependancy library materials (handled by npm)
 node_modules/

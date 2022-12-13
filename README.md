@@ -46,7 +46,7 @@ I have to move between many platforms and machines I just want to outline the to
 Test connection to the pizero with `http://raspzero01.local:8080/`
 
 ## Hardware Notes
-The device consists of 2 servo motors arranged in a way as to control the azumuth and assension of a platform to which is attached a laser pointer. All devices respond to $I^2C$ commands. Fortunately on the $\Pi$ there is are node libraries that make this easy to control.
+The device consists of 2 servo motors arranged in a way as to control the azumuth and assension of a platform to which is attached a laser pointer. All devices respond to $I^2C$ commands. Fortunately on the $\Pi$ there are node libraries that make this easy to control.
 
 ### **Laser peripheral**
 DEVICE ADDR 0x14
